@@ -39,22 +39,30 @@ class Map extends Component<Props, State> {
 
     componentDidMount() {
         this.setState({ markers: [] });
-
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition((position) => {
-                this.currentLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                this.googleMap = MapsHelper.createGoogleMap(this.googleMapRef, this.currentLocation);
-                this.drawingManager = MapsHelper.createDrawingManager(this.googleMap);
-                MapsHelper.setListeners(this.drawingManager, this.overlayComplete);
-                this.placesService = MapsHelper.createPlacesService(this.googleMap);
-            }, function () {
-
-            });
+        this.currentLocation = {
+            lat: 53.797556,
+            lng: -1.539957
         }
+        this.googleMap = MapsHelper.createGoogleMap(this.googleMapRef, this.currentLocation);
+        this.drawingManager = MapsHelper.createDrawingManager(this.googleMap);
+        MapsHelper.setListeners(this.drawingManager, this.overlayComplete);
+        this.placesService = MapsHelper.createPlacesService(this.googleMap);
+
+        // if (navigator.geolocation) {
+        //     navigator.geolocation.getCurrentPosition((position) => {
+        //         this.currentLocation = {
+        //             lat: position.coords.latitude,
+        //             lng: position.coords.longitude
+        //         };
+
+        //         this.googleMap = MapsHelper.createGoogleMap(this.googleMapRef, this.currentLocation);
+        //         this.drawingManager = MapsHelper.createDrawingManager(this.googleMap);
+        //         MapsHelper.setListeners(this.drawingManager, this.overlayComplete);
+        //         this.placesService = MapsHelper.createPlacesService(this.googleMap);
+        //     }, function () {
+
+        //     });
+        // }
     }
 
     createPlacesService = () => {
@@ -144,7 +152,7 @@ class Map extends Component<Props, State> {
             if (this.state.keyword) {
                 request.name = this.state.keyword;
             }
-    
+
             this.removeAllMarkers();
             var temp_markers: MarkerObject[] = [];
             this.placesService.nearbySearch(request, (results: any, status: any) => {
@@ -173,7 +181,7 @@ class Map extends Component<Props, State> {
 
     inputChanged = (event: any) => {
         this.setState({ keyword: event.target.value }, () => {
-            
+
         });
     }
 
@@ -222,12 +230,15 @@ class Map extends Component<Props, State> {
     render() {
 
         return (
-            <div className="row">
+            <div className="row" style={{marginRight: '0px'}}>
                 <div className="col-lg-3" style={{ paddingLeft: '30px' }}>
                     <div className="row">
                         <div className="col-sm-12">
                             <div style={{ textAlign: 'left' }}>
-                                <div className="form-group">
+                                <div className="alert alert-success" role="alert" style={{marginBottom: '5px', marginTop: '5px'}}>
+                                    Press the 'Circle' on the google maps at the TOP CENTER of the map to select the area.
+                                </div>
+                                <div className="form-group" style={{marginBottom: '5px'}}>
                                     <label>Places type</label>
                                     <select value={this.state.selected_type} onChange={this.selectChanged} className="form-control">
                                         <option value="all">All</option>
@@ -251,7 +262,7 @@ class Map extends Component<Props, State> {
                     </div>
 
                 </div>
-                <div className="col-lg-9">
+                <div className="col-lg-9" style={{paddingRight: '0px'}}>
                     <div
                         id="google-map"
                         ref={this.googleMapRef}

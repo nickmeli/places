@@ -28,6 +28,6 @@
 .places-list {
   width: 100%;
   background-color: #ffffff;
-  height: calc(100vh - 172px);
+  height: calc(100vh - 293px);
   overflow-y: scroll;
 }
