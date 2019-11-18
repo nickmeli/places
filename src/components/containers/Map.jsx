@@ -1,31 +1,18 @@
 import React, { Component } from 'react';
 import { MarkerObject } from '../models/Marker';
-import { MapsHelper } from '../../helpers/MapsService';
+import { createGoogleMap, createDrawingManager, setListeners, createMarkerObject, createPlacesService } from '../../helpers/MapService';
 import { PlacesList } from './PlacesList';
 
-export interface Props {
-    ShowMarker: boolean
-}
+class Map extends Component {
+    previusObjects = null;
+    googleMapRef = React.createRef();
+    googleMap;
+    drawingManager;
+    placesService;
+    currentLocation = {};
+    openedMarker = null;
 
-export interface State {
-    markers: MarkerObject[],
-    center: any,
-    radius: number,
-    selected_type: string,
-    keyword: string
-}
-
-class Map extends Component<Props, State> {
-    previusObjects: any = null;
-    googleMapRef: any = React.createRef();
-    googleMap: any;
-    drawingManager: any;
-    placesService: any;
-    // markers: MarkerObject[] = [];
-    currentLocation: any = {};
-    openedMarker: any = null;
-
-    constructor(props: Props) {
+    constructor(props) {
         super(props);
 
         this.state = {
@@ -39,38 +26,38 @@ class Map extends Component<Props, State> {
 
     componentDidMount() {
         this.setState({ markers: [] });
-        this.currentLocation = {
-            lat: 53.797556,
-            lng: -1.539957
-        }
-        this.googleMap = MapsHelper.createGoogleMap(this.googleMapRef, this.currentLocation);
-        this.drawingManager = MapsHelper.createDrawingManager(this.googleMap);
-        MapsHelper.setListeners(this.drawingManager, this.overlayComplete);
-        this.placesService = MapsHelper.createPlacesService(this.googleMap);
-
-        // if (navigator.geolocation) {
-        //     navigator.geolocation.getCurrentPosition((position) => {
-        //         this.currentLocation = {
-        //             lat: position.coords.latitude,
-        //             lng: position.coords.longitude
-        //         };
-
-        //         this.googleMap = MapsHelper.createGoogleMap(this.googleMapRef, this.currentLocation);
-        //         this.drawingManager = MapsHelper.createDrawingManager(this.googleMap);
-        //         MapsHelper.setListeners(this.drawingManager, this.overlayComplete);
-        //         this.placesService = MapsHelper.createPlacesService(this.googleMap);
-        //     }, function () {
-
-        //     });
+        // this.currentLocation = {
+        //     lat: 53.797556,
+        //     lng: -1.539957
         // }
+        // this.googleMap = createGoogleMap(this.googleMapRef, this.currentLocation);
+        // this.drawingManager = createDrawingManager(this.googleMap);
+        // setListeners(this.drawingManager, this.overlayComplete);
+        // this.placesService = createPlacesService(this.googleMap);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                this.currentLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                this.googleMap = createGoogleMap(this.googleMapRef, this.currentLocation);
+                this.drawingManager = createDrawingManager(this.googleMap);
+                setListeners(this.drawingManager, this.overlayComplete);
+                this.placesService = createPlacesService(this.googleMap);
+            }, function () {
+
+            });
+        }
     }
 
     createPlacesService = () => {
-        this.placesService = new (window as any).google.maps.places.PlacesService(this.googleMap);
+        this.placesService = new window.google.maps.places.PlacesService(this.googleMap);
     }
 
-    createMarker = (markerObj: MarkerObject) => {
-        var marker = MapsHelper.createMarker(markerObj, this.googleMap);
+    createMarker = (markerObj) => {
+        var marker = createMarkerObject(markerObj, this.googleMap);
 
         marker.addListener('click', () => {
             if (this.openedMarker) {
@@ -83,7 +70,7 @@ class Map extends Component<Props, State> {
         return marker;
     }
 
-    overlayComplete = (event: any) => {
+    overlayComplete = (event) => {
         if (this.previusObjects) {
             this.previusObjects['overlay'].setMap(null);
         }
@@ -99,16 +86,16 @@ class Map extends Component<Props, State> {
                 name: ''
             };
             if (this.state.selected_type != 'all') {
-                request.type.push(this.state.selected_type as never);
+                request.type.push(this.state.selected_type);
             }
             if (this.state.keyword) {
                 request.name = this.state.keyword;
             }
             this.setState({ center: center, radius: radius });
             this.removeAllMarkers();
-            var temp_markers: MarkerObject[] = [];
-            this.placesService.nearbySearch(request, (results: any, status: any) => {
-                if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+            var temp_markers = [];
+            this.placesService.nearbySearch(request, (results, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; i < results.length; i++) {
                         var marker = new MarkerObject(
                             results[i].geometry.location.lat(),
@@ -138,7 +125,7 @@ class Map extends Component<Props, State> {
         }
     }
 
-    selectChanged = (event: any) => {
+    selectChanged = (event) => {
         this.setState({ selected_type: event.target.value }, () => {
             var request = {
                 location: this.state.center,
@@ -147,16 +134,16 @@ class Map extends Component<Props, State> {
                 name: ''
             };
             if (this.state.selected_type != 'all') {
-                request.type.push(this.state.selected_type as never);
+                request.type.push(this.state.selected_type);
             }
             if (this.state.keyword) {
                 request.name = this.state.keyword;
             }
 
             this.removeAllMarkers();
-            var temp_markers: MarkerObject[] = [];
-            this.placesService.nearbySearch(request, (results: any, status: any) => {
-                if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+            var temp_markers = [];
+            this.placesService.nearbySearch(request, (results, status) => {
+                if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                     for (var i = 0; i < results.length; i++) {
                         var marker = new MarkerObject(
                             results[i].geometry.location.lat(),
@@ -179,13 +166,13 @@ class Map extends Component<Props, State> {
         });
     }
 
-    inputChanged = (event: any) => {
+    inputChanged = (event) => {
         this.setState({ keyword: event.target.value }, () => {
 
         });
     }
 
-    keyDown = (event: any) => {
+    keyDown = (event) => {
         if (event.key !== 'Enter') {
             return;
         }
@@ -196,16 +183,16 @@ class Map extends Component<Props, State> {
             name: ''
         };
         if (this.state.selected_type != 'all') {
-            request.type.push(this.state.selected_type as never);
+            request.type.push(this.state.selected_type);
         }
         if (this.state.keyword) {
             request.name = this.state.keyword;
         }
 
         this.removeAllMarkers();
-        var temp_markers: MarkerObject[] = [];
-        this.placesService.nearbySearch(request, (results: any, status: any) => {
-            if (status === (window as any).google.maps.places.PlacesServiceStatus.OK) {
+        var temp_markers = [];
+        this.placesService.nearbySearch(request, (results, status) => {
+            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                 for (var i = 0; i < results.length; i++) {
                     var marker = new MarkerObject(
                         results[i].geometry.location.lat(),

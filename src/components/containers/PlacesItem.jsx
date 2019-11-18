@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { MarkerObject } from '../models/Marker';
 
-export interface Props {
-    Marker: MarkerObject;
-}
-
-export class PlacesItem extends Component<Props, object> {
+export class PlacesItem extends Component {
+    constructor(props) {
+        super(props);
+    }
+    
     render() {
         return (
             <div className="row">
