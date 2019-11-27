@@ -24,7 +24,7 @@ export function createDrawingManager(googleMap) {
             fillOpacity: 0.05,
             strokeWeight: 2,
             clickable: false,
-            editable: true,
+            editable: false,
             zIndex: 1
         }
     });
@@ -39,14 +39,13 @@ export function setListeners(drawingManager, callback) {
     });
 }
 
-export function createMarkerObject(markerObj, googleMap) {
+export function createMarkerObject(lat, lng, title, photo, googleMap) {
     var infowindow = new window.google.maps.InfoWindow({
-        content: creaMarkerInfoWindow(markerObj)
+        content: creaMarkerInfoWindow(title, photo)
     });
-    markerObj.infowindow = infowindow;
 
     var marker = new window.google.maps.Marker({
-        position: { lat: markerObj.lat, lng: markerObj.lng },
+        position: { lat: lat, lng: lng },
         map: googleMap,
         infowindow: infowindow
         // icon: marker.icon
