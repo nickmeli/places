@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import { createGoogleMap, createDrawingManager, setListeners, createMarkerObject, createPlacesService } from '../../helpers/MapService';
+import { createMarkerObject} from '../../helpers/MapService';
 import { connect } from "react-redux";
 import { getMarkers, setCenter } from '../../actions';
+import { MapClass } from '../../helpers/MapClass';
 
 class Map extends Component {
     previusObjects = null;
     googleMapRef = React.createRef();
-    googleMap;
-    drawingManager;
-    placesService;
     currentLocation = {};
     openedMarker = null;
     markers = [];
@@ -34,30 +32,22 @@ class Map extends Component {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-
-                this.googleMap = createGoogleMap(this.googleMapRef, this.currentLocation);
-                this.drawingManager = createDrawingManager(this.googleMap);
-                setListeners(this.drawingManager, this.overlayComplete);
-                this.placesService = createPlacesService(this.googleMap);
-                this.props.setPlacesService(this.placesService);
+                MapClass.googleMapRef = this.googleMapRef;
+                MapClass.initiate(this.currentLocation, this.overlayComplete);
             }, function () {
 
             });
         }
     }
 
-    createPlacesService = () => {
-        this.placesService = new window.google.maps.places.PlacesService(this.googleMap);
-    }
-
     createMarker = (lat, lng, title, photo) => {
-        var marker = createMarkerObject(lat, lng, title, photo, this.googleMap);
+        var marker = createMarkerObject(lat, lng, title, photo, MapClass.googleMap);
 
         marker.addListener('click', () => {
             if (this.openedMarker) {
-                this.openedMarker.infowindow.close(this.googleMap, this.openedMarker);
+                this.openedMarker.infowindow.close(MapClass.googleMap, this.openedMarker);
             }
-            marker.infowindow.open(this.googleMap, marker);
+            marker.infowindow.open(MapClass.googleMap, marker);
             this.openedMarker = marker;
         });
 
@@ -91,7 +81,7 @@ class Map extends Component {
             this.setState({ center: center, radius: radius });
 
             this.props.setCenter({ center: center, radius: radius });
-            this.props.getMarkers(this.placesService);
+            this.props.getMarkers(MapClass.placesService);
         }
     }
 
@@ -130,7 +120,6 @@ function mapStateToProps(state) {
     };
 }
 
-// export default Map;
 export default connect(
     mapStateToProps,
     { getMarkers, setCenter }

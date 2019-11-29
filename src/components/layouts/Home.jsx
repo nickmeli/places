@@ -23,7 +23,7 @@ class Home extends Component {
                 <div className="col-lg-3" style={{ paddingLeft: '30px' }}>
                     <div className="row">
                         <div className="col-sm-12">
-                            <SearchForm placesService={this.state.placesService} />
+                            <SearchForm />
                         </div>
                     </div>
                     <div className="row">
@@ -34,7 +34,7 @@ class Home extends Component {
 
                 </div>
                 <div className="col-lg-9" style={{paddingRight: '0px'}}>
-                    <Map setPlacesService={this.setPlacesService}/>
+                    <Map />
                 </div>
             </div>
         </div>)

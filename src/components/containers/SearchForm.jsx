@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from "react-redux";
 import { getMarkers, setFilter } from '../../actions';
+import { MapClass } from '../../helpers/MapClass';
 
 class PlacesSearchForm extends Component {
     constructor(props) {
@@ -22,7 +23,7 @@ class PlacesSearchForm extends Component {
                 type: type,
                 name: this.state.keyword
             });
-            this.props.getMarkers(this.props.placesService);
+            this.props.getMarkers(MapClass.placesService);
         });
     }
 
@@ -43,7 +44,7 @@ class PlacesSearchForm extends Component {
             type: type,
             name: this.state.keyword
         });
-        this.props.getMarkers(this.props.placesService);
+        this.props.getMarkers(MapClass.placesService);
     }
 
     render() {
