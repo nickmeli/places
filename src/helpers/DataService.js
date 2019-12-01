@@ -7,7 +7,7 @@ export function getMarkersPrimise(placesService, center, filter) {
         type: filter.type,
         name: filter.name
     };
-    
+
     return new Promise(function (resolve, reject) {
         service.nearbySearch(request, (results, status) => {
             if (status === window.google.maps.places.PlacesServiceStatus.OK) {

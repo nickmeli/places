@@ -5,21 +5,16 @@ import { getMarkers, setCenter } from '../../actions';
 import { MapClass } from '../../helpers/MapClass';
 
 class Map extends Component {
-    previusObjects = null;
     googleMapRef = React.createRef();
-    currentLocation = {};
-    openedMarker = null;
     markers = [];
 
     constructor(props) {
         super(props);
 
         this.state = {
-            markers: [],
-            center: null,
-            radius: 0,
-            selected_type: 'all',
-            keyword: ''
+            openedMarker: null,
+            currentLocation: {},
+            previusObjects: null
         };
     }
 
@@ -28,12 +23,13 @@ class Map extends Component {
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
-                this.currentLocation = {
+                this.setState({currentLocation: {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
-                };
-                MapClass.googleMapRef = this.googleMapRef;
-                MapClass.initiate(this.currentLocation, this.overlayComplete);
+                }}, function () {
+                    MapClass.googleMapRef = this.googleMapRef;
+                    MapClass.initiate(this.state.currentLocation, this.overlayComplete);
+                });
             }, function () {
 
             });
@@ -48,7 +44,7 @@ class Map extends Component {
                 this.openedMarker.infowindow.close(MapClass.googleMap, this.openedMarker);
             }
             marker.infowindow.open(MapClass.googleMap, marker);
-            this.openedMarker = marker;
+            this.setState({ openedMarker: marker});
         });
 
         return marker;
@@ -57,28 +53,14 @@ class Map extends Component {
     overlayComplete = (event) => {
         this.removeAllMarkers();
 
-        if (this.previusObjects) {
-            this.previusObjects['overlay'].setMap(null);
+        if (this.state.previusObjects) {
+            this.state.previusObjects['overlay'].setMap(null);
         }
-        this.previusObjects = event;
+        this.setState({ previusObjects: event});
         if (event.type === "circle") {
             
             var center = { lat: event.overlay.center.lat(), lng: event.overlay.center.lng() };
             var radius = event.overlay.radius;
-
-            var request = {
-                location: center,
-                radius: radius,
-                type: [],
-                name: ''
-            };
-            if (this.state.selected_type !== 'all') {
-                request.type.push(this.state.selected_type);
-            }
-            if (this.state.keyword) {
-                request.name = this.state.keyword;
-            }
-            this.setState({ center: center, radius: radius });
 
             this.props.setCenter({ center: center, radius: radius });
             this.props.getMarkers(MapClass.placesService);

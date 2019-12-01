@@ -23,7 +23,12 @@ class PlacesSearchForm extends Component {
                 type: type,
                 name: this.state.keyword
             });
-            this.props.getMarkers(MapClass.placesService);
+            if (MapClass.placesService) {
+                this.props.getMarkers(MapClass.placesService);
+            }
+            else {
+                alert('Google places service is not instantiated.');
+            }
         });
     }
 
@@ -44,7 +49,12 @@ class PlacesSearchForm extends Component {
             type: type,
             name: this.state.keyword
         });
-        this.props.getMarkers(MapClass.placesService);
+        if (MapClass.placesService) {
+            this.props.getMarkers(MapClass.placesService);
+        }
+        else {
+            alert('Google places service is not instantiated.');
+        }
     }
 
     render() {

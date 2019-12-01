@@ -4,17 +4,6 @@ import { Places } from '../containers/PlacesList';
 import { SearchForm } from '../containers/SearchForm';
 
 class Home extends Component {
-    constructor(props) {
-        super(props);
-
-        this.state = {
-            placesService: null
-        };
-    }
-
-    setPlacesService = (service) => {
-        this.setState({ placesService: service });
-    }
 
     render() {
         return (
