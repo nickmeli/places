@@ -17,21 +17,3 @@ export const store = createStore<RootState, any, any, any>(
 );
 
 sagaMiddleware.run(rootSaga);
-
-// const initialiseSagaMiddleware = createSagaMiddleware();
-
-// export const store = createStore(rootReducer);
-// const storeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-
-// const store = createStore(
-//     rootReducer,
-//     storeEnhancers(
-//         applyMiddleware(initialiseSagaMiddleware)
-//     )
-// );
-
-// initialiseSagaMiddleware.run(apiSaga);
-
-// const store = createStore<RootState, any, any, any>(rootReducer);
-
-// export { store };
